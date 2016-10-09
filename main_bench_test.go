@@ -12,13 +12,19 @@ import (
 )
 
 var (
-	data, _ = bindata.Asset("photo.jpg")
+	data, bErr = bindata.Asset("photo.jpg")
 
 	item = &lib.PbFile{
 		Name: "photo.jpg",
 		Data: data,
 	}
 )
+
+func TestAsset(t *testing.T) {
+	if bErr != nil {
+		t.Fatal(bErr)
+	}
+}
 
 func BenchmarkMarshalBSON(b *testing.B) {
 	for n := 0; n < b.N; n++ {
