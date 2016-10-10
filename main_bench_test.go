@@ -3,7 +3,12 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
+	"flag"
+	"fmt"
+	"math/rand"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/tgreiser/compare-api-encodings/bindata"
@@ -19,6 +24,29 @@ var (
 		Data: data,
 	}
 )
+
+func init() {
+	m := flag.Int("size", 0, "size of data in MB (0 = sample data, max = 1024)")
+	flag.Parse()
+
+	if *m == 0 {
+		return
+	}
+	if *m > 1024 {
+		*m = 1024
+	}
+
+	s := *m * 1000000
+
+	rns := rand.New(rand.NewSource(time.Now().Unix()))
+	rb := make([]byte, s)
+	if _, err := rns.Read(rb); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	item.Data = rb
+}
 
 func TestAsset(t *testing.T) {
 	if bErr != nil {
